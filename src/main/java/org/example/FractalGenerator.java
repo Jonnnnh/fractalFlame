@@ -31,17 +31,17 @@ public class FractalGenerator {
     public FractalImage generateFractal(FractalConfig config, ImageProcessor imageProcessor) {
         List<Transformation> transformations = transformationFactory.createTransformations(config.transformations);
         FractalImage fractalImage = FractalImage.create(config.width, config.height);
-        List<AffineTransformation> affines = generateAffineTransformations(config.affineCoefficients);
-        renderer.render(fractalImage, affines, transformations, config);
+        List<AffineTransformation> affineTransformations = generateAffineTransformations(config.affineCoefficients);
+        renderer.render(fractalImage, affineTransformations, transformations, config);
         imageProcessor.process(fractalImage);
         return fractalImage;
     }
 
     private List<AffineTransformation> generateAffineTransformations(int count) {
-        List<AffineTransformation> affines = new ArrayList<>();
+        List<AffineTransformation> affineTransformations = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            affines.add(AffineTransformation.getRandomTransformation());
+            affineTransformations.add(AffineTransformation.createRandomTransformation());
         }
-        return affines;
+        return affineTransformations;
     }
 }

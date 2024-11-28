@@ -18,7 +18,7 @@ public class SingleThreadRenderer implements FractalRenderer {
     private static final double XMAX = 1.0;
     private static final double YMIN = -1.0;
     private static final double YMAX = 1.0;
-    private static final int RENDER_STEP_THRESHOLD = 20;
+    private static final int RENDER_STEP = 20;
     private final Random random = new Random();
 
     private final SymmetryHandler symmetryHandler;
@@ -28,7 +28,7 @@ public class SingleThreadRenderer implements FractalRenderer {
     }
 
     @Override
-    public void render(FractalImage image, List<AffineTransformation> affines,
+    public void render(FractalImage image, List<AffineTransformation> affineTransformations,
                        List<Transformation> transformations, FractalConfig config) {
         int xRes = image.width();
         int yRes = image.height();
@@ -42,9 +42,8 @@ public class SingleThreadRenderer implements FractalRenderer {
             double newX = getRandomValue(XMIN, XMAX);
             double newY = getRandomValue(YMIN, YMAX);
 
-            for (int step = -RENDER_STEP_THRESHOLD; step < iterations; step++) {
-                int i = random.nextInt(affines.size());
-                AffineTransformation affine = affines.get(i);
+            for (int step = -RENDER_STEP; step < iterations; step++) {
+                AffineTransformation affine = affineTransformations.get(random.nextInt(affineTransformations.size()));
 
                 Point transformedPoint = affine.apply(new Point(newX, newY));
 
@@ -64,9 +63,9 @@ public class SingleThreadRenderer implements FractalRenderer {
                         Color color = affine.getColor();
 
                         if (pixel.hitCount() == 0) {
-                            image.setPixel(x1, y1, new Pixel(color.red(), color.green(), color.blue(), 1));
+                            image.setPixel(x1, y1, new Pixel(color.red(), color.green(), color.blue(), 1)); // тоже вынести
                         } else {
-                            int red = (pixel.red() + color.red()) / 2;
+                            int red = (pixel.red() + color.red()) / 2; // вынести
                             int green = (pixel.green() + color.green()) / 2;
                             int blue = (pixel.blue() + color.blue()) / 2;
                             image.setPixel(x1, y1, pixel.hit().setColor(red, green, blue));

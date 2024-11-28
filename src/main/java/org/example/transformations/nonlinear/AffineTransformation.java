@@ -10,8 +10,9 @@ import java.util.Random;
 public class AffineTransformation implements Transformation {
     private static final double COEFFICIENT_RANGE_MIN = -1.0;
     private static final double COEFFICIENT_RANGE_MAX = 1.0;
+    private final static int MAX_RGB_VALUE = 255;
 
-    private static final Random RANDOM = new Random();
+    private static final Random random = new Random();
 
     private final double a, b, c, d, e, f;
     @Getter
@@ -27,18 +28,18 @@ public class AffineTransformation implements Transformation {
         this.color = color;
     }
 
-    public static AffineTransformation getRandomTransformation() {
+    public static AffineTransformation createRandomTransformation() {
         double a, b, d, e, c, f;
 
         do {
-            a = getRandomCoefficient();
-            b = getRandomCoefficient();
-            d = getRandomCoefficient();
-            e = getRandomCoefficient();
+            a = getRandomAffineCoefficient();
+            b = getRandomAffineCoefficient();
+            d = getRandomAffineCoefficient();
+            e = getRandomAffineCoefficient();
         } while (!isValidCoefficients(a, b, d, e));
 
-        c = getRandomCoefficient();
-        f = getRandomCoefficient();
+        c = getRandomAffineCoefficient();
+        f = getRandomAffineCoefficient();
 
         Color randomColor = generateRandomColor();
 
@@ -50,8 +51,8 @@ public class AffineTransformation implements Transformation {
 
     }
 
-    private static double getRandomCoefficient() {
-        return COEFFICIENT_RANGE_MIN + (COEFFICIENT_RANGE_MAX - COEFFICIENT_RANGE_MIN) * RANDOM.nextDouble();
+    private static double getRandomAffineCoefficient() {
+        return COEFFICIENT_RANGE_MIN + (COEFFICIENT_RANGE_MAX - COEFFICIENT_RANGE_MIN) * random.nextDouble();
     }
 
     @Override
@@ -62,7 +63,7 @@ public class AffineTransformation implements Transformation {
     }
 
     private static Color generateRandomColor() {
-        return new Color(RANDOM.nextInt(256), RANDOM.nextInt(256), RANDOM.nextInt(256));
+        return new Color(random.nextInt(MAX_RGB_VALUE), random.nextInt(MAX_RGB_VALUE), random.nextInt(MAX_RGB_VALUE));
 
     }
 

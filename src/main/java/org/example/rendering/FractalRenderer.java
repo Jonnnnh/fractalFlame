@@ -8,6 +8,6 @@ import org.example.transformations.nonlinear.AffineTransformation;
 import java.util.List;
 
 public interface FractalRenderer {
-    void render(FractalImage image, List<AffineTransformation> affines,
+    void render(FractalImage image, List<AffineTransformation> affineTransformations,
                 List<Transformation> transformations, FractalConfig config);
 }
