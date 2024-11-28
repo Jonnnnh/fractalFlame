@@ -1,0 +1,11 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "iterations": 10000,
+  "transformations": ["handkerchief", "polar"],
+  "threads": 4,
+  "gamma": 10.0,
+  "points": 1000,
+  "symmetricalParts": 1,
+  "affineCoefficients": 10
+}
