@@ -1,6 +1,6 @@
 package org.example.transformations;
 
-import org.example.transformations.nonlinear.AffineTransformation;
+import org.example.transformations.linear.AffineTransformation;
 
 import java.util.ArrayList;
 import java.util.List;

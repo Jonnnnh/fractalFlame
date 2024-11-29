@@ -3,7 +3,7 @@ package org.example.rendering;
 import org.example.config.FractalConfig;
 import org.example.core.FractalImage;
 import org.example.transformations.Transformation;
-import org.example.transformations.nonlinear.AffineTransformation;
+import org.example.transformations.linear.AffineTransformation;
 
 import java.util.List;
 

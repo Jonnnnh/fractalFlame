@@ -1,4 +1,4 @@
-package org.example.transformations.nonlinear;
+package org.example.transformations.linear;
 
 import lombok.Getter;
 import org.example.core.Point;
@@ -64,7 +64,5 @@ public class AffineTransformation implements Transformation {
 
     private static Color generateRandomColor() {
         return new Color(random.nextInt(MAX_RGB_VALUE), random.nextInt(MAX_RGB_VALUE), random.nextInt(MAX_RGB_VALUE));
-
     }
-
 }

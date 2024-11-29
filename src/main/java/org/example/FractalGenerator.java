@@ -8,7 +8,7 @@ import org.example.rendering.SingleThreadRenderer;
 import org.example.transformations.Transformation;
 import org.example.transformations.TransformationFactory;
 import org.example.transformations.AffineTransformationGenerator;
-import org.example.transformations.nonlinear.AffineTransformation;
+import org.example.transformations.linear.AffineTransformation;
 
 import java.util.List;
 

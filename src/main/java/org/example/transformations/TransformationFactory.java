@@ -1,6 +1,6 @@
 package org.example.transformations;
 
-import org.example.transformations.linear.*;
+import org.example.transformations.nonlinear.*;
 
 import java.util.*;
 
@@ -19,6 +19,8 @@ public class TransformationFactory {
         transformations.put("swirl", new SwirlTransformation());
         transformations.put("eyefish", new EyefishTransformation());
         transformations.put("tangent", new TangentTransformation());
+        transformations.put("hyperbolic", new HyperbolicTransformation());
+
     }
 
     public static List<Transformation> createTransformations(List<String> transformationNames) {
@@ -29,7 +31,7 @@ public class TransformationFactory {
             if (transformation != null) {
                 transformations.add(transformation);
             } else {
-                throw new IllegalArgumentException(STR."Unknown transformation: \{name}");
+                throw new IllegalArgumentException(String.format("Unknown transformation: %s", name));
             }
         }
 

@@ -1,4 +1,4 @@
-package org.example.transformations.linear;
+package org.example.transformations.nonlinear;
 
 import org.example.core.Point;
 import org.example.transformations.Transformation;

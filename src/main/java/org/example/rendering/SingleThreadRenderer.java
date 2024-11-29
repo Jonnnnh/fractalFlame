@@ -7,12 +7,17 @@ import org.example.core.Point;
 import org.example.core.Rect;
 import org.example.core.Color;
 import org.example.transformations.Transformation;
-import org.example.transformations.nonlinear.AffineTransformation;
+import org.example.transformations.linear.AffineTransformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class SingleThreadRenderer implements FractalRenderer {
+    private static final Logger log = LoggerFactory.getLogger(SingleThreadRenderer.class);
 
     private static final double X_MIN = -1.777;
     private static final double X_MAX = 1.777;
@@ -35,9 +40,11 @@ public class SingleThreadRenderer implements FractalRenderer {
         int points = config.points;
         int iterations = config.iterations;
         int symmetricalParts = config.symmetricalParts;
-        int motionBlurLength =  config.motionBlurLength;
+        int motionBlurLength = config.motionBlurLength;
 
         Rect fractalRect = new Rect(X_MIN, Y_MIN, X_MAX - X_MIN, Y_MAX - Y_MIN);
+
+        long startTime = System.nanoTime();
 
         for (int num = 0; num < points; num++) {
             double newX = getRandomValue(X_MIN, X_MAX);
@@ -46,48 +53,58 @@ public class SingleThreadRenderer implements FractalRenderer {
             for (int step = -RENDER_STEP; step < iterations; step++) {
 
                 AffineTransformation affine = affineTransformations.get(random.nextInt(affineTransformations.size()));
-                Point transformedPoint = applyTransformations(affine, new Point(newX, newY), transformations);
+                Point transformedPoint = affine.apply(new Point(newX, newY));
 
-                newX = transformedPoint.x();
-                newY = transformedPoint.y();
+                List<Point> transformedPoints = applyAllTransformations(transformedPoint, transformations);
 
-                if (step >= 0 && newX >= X_MIN && newX <= X_MAX && newY >= Y_MIN && newY <= Y_MAX) {
-                    int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
-                    int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
+                for (Point point : transformedPoints) {
+                    newX = point.x();
+                    newY = point.y();
 
-                    if (image.contains(x1, y1)) {
-                        Pixel pixel = image.getPixel(x1, y1);
-                        Color color = affine.getColor();
+                    if (step >= 0 && newX >= X_MIN && newX <= X_MAX && newY >= Y_MIN && newY <= Y_MAX) {
+                        int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
+                        int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
 
-                        for (int i = 0; i < motionBlurLength; i++) {
-                            double offsetX = getRandomValue(-0.1, 0.1);
-                            double offsetY = getRandomValue(-0.1, 0.1);
+                        if (image.contains(x1, y1)) {
+                            Pixel pixel = image.getPixel(x1, y1);
+                            Color color = affine.getColor();
 
-                            int blurredX = (int) (x1 + offsetX);
-                            int blurredY = (int) (y1 + offsetY);
+                            for (int i = 0; i < motionBlurLength; i++) {
+                                double offsetX = getRandomValue(-0.1, 0.1);
+                                double offsetY = getRandomValue(-0.1, 0.1);
 
-                            if (image.contains(blurredX, blurredY)) {
-                                Pixel blurredPixel = image.getPixel(blurredX, blurredY);
-                                int red = (pixel.red() + color.red()) / 2;
-                                int green = (pixel.green() + color.green()) / 2;
-                                int blue = (pixel.blue() + color.blue()) / 2;
-                                image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
+                                int blurredX = (int) (x1 + offsetX);
+                                int blurredY = (int) (y1 + offsetY);
+
+                                if (image.contains(blurredX, blurredY)) {
+                                    Pixel blurredPixel = image.getPixel(blurredX, blurredY);
+                                    int red = (pixel.red() + color.red()) / 2;
+                                    int green = (pixel.green() + color.green()) / 2;
+                                    int blue = (pixel.blue() + color.blue()) / 2;
+                                    image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
+                                }
                             }
-                        }
 
-                        symmetryHandler.applySymmetry(image, transformedPoint, color, xRes, yRes, fractalRect, symmetricalParts);
+                            symmetryHandler.applySymmetry(image, point, color, xRes, yRes, fractalRect, symmetricalParts);
+                        }
                     }
                 }
             }
         }
+
+        long endTime = System.nanoTime();
+        log.info("Rendering time: {} seconds", TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
     }
 
-    private Point applyTransformations(AffineTransformation affine, Point point, List<Transformation> transformations) {
-        Point transformedPoint = affine.apply(point);
+    private List<Point> applyAllTransformations(Point point, List<Transformation> transformations) {
+        List<Point> transformedPoints = new ArrayList<>();
+
         for (Transformation transformation : transformations) {
-            transformedPoint = transformation.apply(transformedPoint);
+            Point transformedPoint = transformation.apply(point);
+            transformedPoints.add(transformedPoint);
         }
-        return transformedPoint;
+
+        return transformedPoints;
     }
 
     private double getRandomValue(double min, double max) {

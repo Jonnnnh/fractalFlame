@@ -28,9 +28,9 @@ public class Main {
             String outputPath = FileUtils.generateFileName(ImageFormat.PNG.getStringFormat());
             saveFractalImage(fractalImage, outputPath);
 
-            logger.info("Фрактал сгенерирован и сохранен в файл: {}", outputPath);
+            logger.info("Fractal generated and saved to a file: {}", outputPath);
         } catch (IOException e) {
-            logger.error("Ошибка при загрузке конфигурации или сохранении фрактала", e);
+            logger.error("Error when loading configuration or saving fractal", e);
         }
     }
 
