@@ -30,12 +30,17 @@ public class GammaCorrection implements ImageProcessor {
                 Pixel pixel = image.getPixel(x, y);
                 normals[y][x] /= max;
 
-                pixel = pixel.setColor(
-                        (int) (pixel.red() * Math.pow(normals[y][x], 1.0 / gamma)),
-                        (int) (pixel.green() * Math.pow(normals[y][x], 1.0 / gamma)),
-                        (int) (pixel.blue() * Math.pow(normals[y][x], 1.0 / gamma))
-                );
+                int correctedRed = (int) (pixel.red() * Math.pow(normals[y][x], 1.0 / gamma));
+                int correctedGreen = (int) (pixel.green() * Math.pow(normals[y][x], 1.0 / gamma));
+                int correctedBlue = (int) (pixel.blue() * Math.pow(normals[y][x], 1.0 / gamma));
 
+                if (pixel.hitCount() > 50) {
+                    correctedRed = Math.min(255, correctedRed + 30);
+                    correctedGreen = Math.min(255, correctedGreen + 30);
+                    correctedBlue = Math.min(255, correctedBlue + 30);
+                }
+
+                pixel = pixel.setColor(correctedRed, correctedGreen, correctedBlue);
                 image.setPixel(x, y, pixel);
             }
         }

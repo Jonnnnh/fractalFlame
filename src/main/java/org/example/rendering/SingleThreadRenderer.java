@@ -68,10 +68,9 @@ public class SingleThreadRenderer implements FractalRenderer {
                         if (image.contains(x1, y1)) {
                             Pixel pixel = image.getPixel(x1, y1);
                             Color color = affine.getColor();
-
                             for (int i = 0; i < motionBlurLength; i++) {
-                                double offsetX = getRandomValue(-0.1, 0.1);
-                                double offsetY = getRandomValue(-0.1, 0.1);
+                                double offsetX = getRandomValue(-0.05, 0.05);
+                                double offsetY = getRandomValue(-0.05, 0.05);
 
                                 int blurredX = (int) (x1 + offsetX);
                                 int blurredY = (int) (y1 + offsetY);

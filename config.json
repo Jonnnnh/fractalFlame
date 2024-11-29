@@ -2,11 +2,11 @@
   "width": 1920,
   "height": 1080,
   "iterations": 15000,
-  "transformations": ["polar"],
+  "transformations": ["hyperbolic"],
   "threads": 4,
-  "gamma": 5.2,
+  "gamma": 10.0,
   "points": 1000,
   "symmetricalParts": 1,
   "affineCoefficients": 10,
-  "motionBlurLength": 5
+  "motionBlurLength": 1
 }
