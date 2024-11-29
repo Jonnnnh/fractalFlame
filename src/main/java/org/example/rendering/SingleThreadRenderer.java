@@ -14,10 +14,10 @@ import java.util.Random;
 
 public class SingleThreadRenderer implements FractalRenderer {
 
-    private static final double XMIN = -1.0;
-    private static final double XMAX = 1.0;
-    private static final double YMIN = -1.0;
-    private static final double YMAX = 1.0;
+    private static final double X_MIN = -1.777;
+    private static final double X_MAX = 1.777;
+    private static final double Y_MIN = -1.0;
+    private static final double Y_MAX = 1.0;
     private static final int RENDER_STEP = 20;
     private final Random random = new Random();
 
@@ -35,40 +35,44 @@ public class SingleThreadRenderer implements FractalRenderer {
         int points = config.points;
         int iterations = config.iterations;
         int symmetricalParts = config.symmetricalParts;
+        int motionBlurLength =  config.motionBlurLength;
 
-        Rect fractalRect = new Rect(XMIN, YMIN, XMAX - XMIN, YMAX - YMIN);
+        Rect fractalRect = new Rect(X_MIN, Y_MIN, X_MAX - X_MIN, Y_MAX - Y_MIN);
 
         for (int num = 0; num < points; num++) {
-            double newX = getRandomValue(XMIN, XMAX);
-            double newY = getRandomValue(YMIN, YMAX);
+            double newX = getRandomValue(X_MIN, X_MAX);
+            double newY = getRandomValue(Y_MIN, Y_MAX);
 
             for (int step = -RENDER_STEP; step < iterations; step++) {
+
                 AffineTransformation affine = affineTransformations.get(random.nextInt(affineTransformations.size()));
-
-                Point transformedPoint = affine.apply(new Point(newX, newY));
-
-                for (Transformation transformation : transformations) {
-                    transformedPoint = transformation.apply(transformedPoint);
-                }
+                Point transformedPoint = applyTransformations(affine, new Point(newX, newY), transformations);
 
                 newX = transformedPoint.x();
                 newY = transformedPoint.y();
 
-                if (step >= 0 && newX >= XMIN && newX <= XMAX && newY >= YMIN && newY <= YMAX) {
-                    int x1 = (int) (xRes - Math.floor(((XMAX - newX) / (XMAX - XMIN)) * xRes));
-                    int y1 = (int) (yRes - Math.floor(((YMAX - newY) / (YMAX - YMIN)) * yRes));
+                if (step >= 0 && newX >= X_MIN && newX <= X_MAX && newY >= Y_MIN && newY <= Y_MAX) {
+                    int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
+                    int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
 
                     if (image.contains(x1, y1)) {
                         Pixel pixel = image.getPixel(x1, y1);
                         Color color = affine.getColor();
 
-                        if (pixel.hitCount() == 0) {
-                            image.setPixel(x1, y1, new Pixel(color.red(), color.green(), color.blue(), 1)); // тоже вынести
-                        } else {
-                            int red = (pixel.red() + color.red()) / 2; // вынести
-                            int green = (pixel.green() + color.green()) / 2;
-                            int blue = (pixel.blue() + color.blue()) / 2;
-                            image.setPixel(x1, y1, pixel.hit().setColor(red, green, blue));
+                        for (int i = 0; i < motionBlurLength; i++) {
+                            double offsetX = getRandomValue(-0.1, 0.1);
+                            double offsetY = getRandomValue(-0.1, 0.1);
+
+                            int blurredX = (int) (x1 + offsetX);
+                            int blurredY = (int) (y1 + offsetY);
+
+                            if (image.contains(blurredX, blurredY)) {
+                                Pixel blurredPixel = image.getPixel(blurredX, blurredY);
+                                int red = (pixel.red() + color.red()) / 2;
+                                int green = (pixel.green() + color.green()) / 2;
+                                int blue = (pixel.blue() + color.blue()) / 2;
+                                image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
+                            }
                         }
 
                         symmetryHandler.applySymmetry(image, transformedPoint, color, xRes, yRes, fractalRect, symmetricalParts);
@@ -76,6 +80,14 @@ public class SingleThreadRenderer implements FractalRenderer {
                 }
             }
         }
+    }
+
+    private Point applyTransformations(AffineTransformation affine, Point point, List<Transformation> transformations) {
+        Point transformedPoint = affine.apply(point);
+        for (Transformation transformation : transformations) {
+            transformedPoint = transformation.apply(transformedPoint);
+        }
+        return transformedPoint;
     }
 
     private double getRandomValue(double min, double max) {

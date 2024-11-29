@@ -5,17 +5,17 @@ import org.example.config.FractalConfig;
 import org.example.core.FractalImage;
 import org.example.processing.GammaCorrection;
 import org.example.processing.ImageProcessor;
-import org.example.rendering.FractalRenderer;
-import org.example.rendering.SingleThreadRenderer;
-import org.example.rendering.SymmetryHandler;
-import org.example.transformations.TransformationFactory;
 import org.example.utils.ImageUtils;
 import org.example.utils.ImageFormat;
 import org.example.utils.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
         try {
             FractalConfig config = ConfigLoader.loadConfig();
@@ -23,22 +23,18 @@ public class Main {
             ImageProcessor gammaProcessor = new GammaCorrection(config.gamma);
 
             FractalGenerator generator = new FractalGenerator();
-
             FractalImage fractalImage = generator.generateFractal(config, gammaProcessor);
 
             String outputPath = FileUtils.generateFileName(ImageFormat.PNG.getStringFormat());
-            ImageFormat format = ImageFormat.PNG;
+            saveFractalImage(fractalImage, outputPath);
 
-            saveFractalImage(fractalImage, format, outputPath);
-
-            System.out.println("Фрактал сгенерирован и сохранен в файл: " + outputPath);
+            logger.info("Фрактал сгенерирован и сохранен в файл: {}", outputPath);
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Ошибка при загрузке конфигурации или сохранении фрактала");
+            logger.error("Ошибка при загрузке конфигурации или сохранении фрактала", e);
         }
     }
 
-    private static void saveFractalImage(FractalImage fractalImage, ImageFormat format, String outputPath) throws IOException {
-        ImageUtils.save(fractalImage, format, outputPath);
+    private static void saveFractalImage(FractalImage fractalImage, String outputPath) throws IOException {
+        ImageUtils.save(fractalImage, ImageFormat.PNG, outputPath);
     }
 }

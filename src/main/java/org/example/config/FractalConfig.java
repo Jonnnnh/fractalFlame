@@ -12,7 +12,7 @@ public class FractalConfig {
     public int points;
     public int symmetricalParts;
     public int affineCoefficients;
-
+    public int motionBlurLength;
 }
 
 

@@ -9,7 +9,7 @@ public class TransformationFactory {
     private static final Map<String, Transformation> transformations = new HashMap<>();
 
     static {
-        transformations.put("cardioid", new CardioidTransformation());
+        transformations.put("heart", new HeartTransformation());
         transformations.put("disc", new DiscTransformation());
         transformations.put("exponential", new ExponentialTransformation());
         transformations.put("handkerchief", new HandkerchiefTransformation());
@@ -17,6 +17,8 @@ public class TransformationFactory {
         transformations.put("sin", new SinTransformation());
         transformations.put("spherical", new SphericalTransformation());
         transformations.put("swirl", new SwirlTransformation());
+        transformations.put("eyefish", new EyefishTransformation());
+        transformations.put("tangent", new TangentTransformation());
     }
 
     public static List<Transformation> createTransformations(List<String> transformationNames) {
@@ -27,7 +29,7 @@ public class TransformationFactory {
             if (transformation != null) {
                 transformations.add(transformation);
             } else {
-                throw new IllegalArgumentException("Unknown transformation: " + name);
+                throw new IllegalArgumentException(STR."Unknown transformation: \{name}");
             }
         }
 
