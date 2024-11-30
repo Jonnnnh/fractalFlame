@@ -2,11 +2,12 @@
   "width": 1920,
   "height": 1080,
   "iterations": 15000,
-  "transformations": ["hyperbolic"],
+  "transformations": ["tangent"],
   "threads": 4,
   "gamma": 10.0,
   "points": 1000,
-  "symmetricalParts": 1,
+  "symmetricalParts": 3,
   "affineCoefficients": 10,
-  "motionBlurLength": 1
+  "motionBlurLength": 1,
+  "multithreadrender": false
 }
