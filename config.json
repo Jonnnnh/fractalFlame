@@ -1,13 +1,14 @@
 {
-  "width": 1920,
-  "height": 1080,
+  "width": 2560,
+  "height": 1440,
   "iterations": 10000,
-  "transformations": ["tangent"],
-  "threads": 4,
+  "transformations": ["disc"],
+  "threads": 10,
   "gamma": 10.0,
   "points": 1000,
   "symmetricalParts": 1,
   "affineCoefficients": 10,
-  "motionBlurLength": 1,
-  "multithreadrender": true
+  "motionBlurLength": 0,
+  "multithreadrender": false,
+  "superSamplingFactor": 5
 }
