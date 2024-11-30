@@ -92,7 +92,7 @@ public class SingleThreadRenderer implements FractalRenderer {
         }
 
         long endTime = System.nanoTime();
-        log.info("Rendering time: {} seconds", TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
+        log.info("SingleThreadRenderer Rendering time: {} seconds", TimeUnit.NANOSECONDS.toSeconds(endTime - startTime));
     }
 
     private List<Point> applyAllTransformations(Point point, List<Transformation> transformations) {
