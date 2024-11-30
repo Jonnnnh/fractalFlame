@@ -29,12 +29,32 @@ public class SingleThreadRenderer implements FractalRenderer {
     private final SymmetryHandler symmetryHandler;
 
     public SingleThreadRenderer(SymmetryHandler symmetryHandler) {
+        if (symmetryHandler == null) {
+            throw new IllegalArgumentException("SymmetryHandler cannot be null");
+        }
         this.symmetryHandler = symmetryHandler;
     }
 
     @Override
     public void render(FractalImage image, List<AffineTransformation> affineTransformations,
                        List<Transformation> transformations, FractalConfig config) {
+
+        if (image == null) {
+            log.error("FractalImage cannot be null");
+            return;
+        }
+        if (affineTransformations == null || affineTransformations.isEmpty()) {
+            log.error("AffineTransformations list is null or empty");
+            return;
+        }
+        if (transformations == null) {
+            transformations = new ArrayList<>();
+        }
+        if (config == null) {
+            log.error("FractalConfig cannot be null");
+            return;
+        }
+
         int xRes = image.width();
         int yRes = image.height();
         int points = config.points;

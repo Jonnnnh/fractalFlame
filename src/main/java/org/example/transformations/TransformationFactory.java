@@ -20,16 +20,24 @@ public class TransformationFactory {
         transformations.put("eyefish", new EyefishTransformation());
         transformations.put("tangent", new TangentTransformation());
         transformations.put("hyperbolic", new HyperbolicTransformation());
-
     }
 
     public static List<Transformation> createTransformations(List<String> transformationNames) {
+        if (transformationNames == null || transformationNames.isEmpty()) {
+            throw new IllegalArgumentException("Transformation list cannot be empty.");
+        }
         List<Transformation> transformations = new ArrayList<>();
 
         for (String name : transformationNames) {
+
+            if (name == null || name.trim().isEmpty()) {
+                throw new IllegalArgumentException("Transformation name cannot be empty or whitespace");
+            }
+
             Transformation transformation = TransformationFactory.transformations.get(name.toLowerCase());
             if (transformation != null) {
                 transformations.add(transformation);
+
             } else {
                 throw new IllegalArgumentException(String.format("Unknown transformation: %s", name));
             }
