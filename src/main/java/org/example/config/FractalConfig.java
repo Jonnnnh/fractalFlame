@@ -13,7 +13,8 @@ public class FractalConfig {
     public int symmetricalParts;
     public int affineCoefficients;
     public int motionBlurLength;
-    public boolean multithreadrender;
+    public boolean multiThreadRender;
+    public int superSamplingFactor;
 }
 
 

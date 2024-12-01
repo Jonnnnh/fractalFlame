@@ -143,37 +143,22 @@ public class MultiThreadRenderer implements FractalRenderer {
                             newY = point.y();
 
                             if (step >= 0 && newX >= X_MIN && newX <= X_MAX && newY >= Y_MIN && newY <= Y_MAX) {
-                                int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
-                                int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
+                                int[] pixelCoordinates = calculatePixelCoordinates(newX, newY, xRes, yRes);
+                                int x1 = pixelCoordinates[0];
+                                int y1 = pixelCoordinates[1];
 
                                 if (y1 >= startRow && y1 < endRow && image.contains(x1, y1)) {
                                     Pixel pixel = image.getPixel(x1, y1);
                                     Color color = affine.getColor();
-                                    for (int i = 0; i < motionBlurLength; i++) {
-                                        double offsetX = getRandomValue(-0.05, 0.05);
-                                        double offsetY = getRandomValue(-0.05, 0.05);
 
-                                        int blurredX = (int) (x1 + offsetX);
-                                        int blurredY = (int) (y1 + offsetY);
-
-                                        if (image.contains(blurredX, blurredY)) {
-                                            Pixel blurredPixel = image.getPixel(blurredX, blurredY);
-                                            int red = (pixel.red() + color.red()) / 2;
-                                            int green = (pixel.green() + color.green()) / 2;
-                                            int blue = (pixel.blue() + color.blue()) / 2;
-
-                                            synchronized (image) {
-                                                image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
-                                            }
-                                        }
-                                    }
-
+                                    applyMotionBlur(image, x1, y1, pixel, color, motionBlurLength);
                                     symmetryHandler.applySymmetry(image, point, color, xRes, yRes, fractalRect, symmetricalParts);
                                 }
                             }
                         }
                     }
                 }
+
             } catch (Exception e) {
                 log.error("Error in FractalTask for thread {}", threadIndex, e);
             }
@@ -194,5 +179,32 @@ public class MultiThreadRenderer implements FractalRenderer {
 
     private double getRandomValue(double min, double max) {
         return min + (max - min) * random.nextDouble();
+    }
+
+    private int[] calculatePixelCoordinates(double newX, double newY, int xRes, int yRes) {
+        int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
+        int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
+        return new int[]{x1, y1};
+    }
+
+    private void applyMotionBlur(FractalImage image, int x1, int y1, Pixel pixel, Color color, int motionBlurLength) {
+        for (int i = 0; i < motionBlurLength; i++) {
+            double offsetX = getRandomValue(-0.05, 0.05);
+            double offsetY = getRandomValue(-0.05, 0.05);
+
+            int blurredX = (int) (x1 + offsetX);
+            int blurredY = (int) (y1 + offsetY);
+
+            if (image.contains(blurredX, blurredY)) {
+                Pixel blurredPixel = image.getPixel(blurredX, blurredY);
+                int red = (pixel.red() + color.red()) / 2;
+                int green = (pixel.green() + color.green()) / 2;
+                int blue = (pixel.blue() + color.blue()) / 2;
+
+                synchronized (image) {
+                    image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
+                }
+            }
+        }
     }
 }

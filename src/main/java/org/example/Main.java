@@ -25,7 +25,7 @@ public class Main {
             FractalGenerator generator = new FractalGenerator();
             FractalImage fractalImage = generator.generateFractal(config, gammaProcessor);
 
-            String outputPath = FileUtils.generateFileName(ImageFormat.PNG.getStringFormat());
+            String outputPath = FileUtils.generateFileName(ImageFormat.JPEG.getStringFormat());
             saveFractalImage(fractalImage, outputPath);
 
             logger.info("Fractal generated and saved to a file: {}", outputPath);
@@ -35,6 +35,6 @@ public class Main {
     }
 
     private static void saveFractalImage(FractalImage fractalImage, String outputPath) throws IOException {
-        ImageUtils.save(fractalImage, ImageFormat.PNG, outputPath);
+        ImageUtils.save(fractalImage, ImageFormat.JPEG, outputPath);
     }
 }

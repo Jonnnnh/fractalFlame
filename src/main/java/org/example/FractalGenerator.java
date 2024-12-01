@@ -30,7 +30,7 @@ public class FractalGenerator {
         List<Transformation> transformations = TransformationFactory.createTransformations(config.transformations);
         FractalImage fractalImage = FractalImage.create(config.width, config.height);
         List<AffineTransformation> affineTransformations = affineTransformationGenerator.generate(config.affineCoefficients);
-        if (config.multithreadrender) {
+        if (config.multiThreadRender) {
             multiThreadRenderer.render(fractalImage, affineTransformations, transformations, config);
         } else {
             renderer.render(fractalImage, affineTransformations, transformations, config);

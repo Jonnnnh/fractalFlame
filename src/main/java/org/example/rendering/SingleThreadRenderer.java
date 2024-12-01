@@ -39,28 +39,13 @@ public class SingleThreadRenderer implements FractalRenderer {
     public void render(FractalImage image, List<AffineTransformation> affineTransformations,
                        List<Transformation> transformations, FractalConfig config) {
 
-        if (image == null) {
-            log.error("FractalImage cannot be null");
-            return;
-        }
-        if (affineTransformations == null || affineTransformations.isEmpty()) {
-            log.error("AffineTransformations list is null or empty");
-            return;
-        }
-        if (transformations == null) {
-            transformations = new ArrayList<>();
-        }
-        if (config == null) {
-            log.error("FractalConfig cannot be null");
-            return;
-        }
-
         int xRes = image.width();
         int yRes = image.height();
         int points = config.points;
         int iterations = config.iterations;
         int symmetricalParts = config.symmetricalParts;
         int motionBlurLength = config.motionBlurLength;
+        int superSamplingFactor = config.superSamplingFactor;
 
         Rect fractalRect = new Rect(X_MIN, Y_MIN, X_MAX - X_MIN, Y_MAX - Y_MIN);
 
@@ -82,27 +67,16 @@ public class SingleThreadRenderer implements FractalRenderer {
                     newY = point.y();
 
                     if (step >= 0 && newX >= X_MIN && newX <= X_MAX && newY >= Y_MIN && newY <= Y_MAX) {
-                        int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
-                        int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
+                        int[] pixelCoordinates = calculatePixelCoordinates(newX, newY, xRes, yRes);
+                        int x1 = pixelCoordinates[0];
+                        int y1 = pixelCoordinates[1];
+
 
                         if (image.contains(x1, y1)) {
                             Pixel pixel = image.getPixel(x1, y1);
                             Color color = affine.getColor();
-                            for (int i = 0; i < motionBlurLength; i++) {
-                                double offsetX = getRandomValue(-0.05, 0.05);
-                                double offsetY = getRandomValue(-0.05, 0.05);
 
-                                int blurredX = (int) (x1 + offsetX);
-                                int blurredY = (int) (y1 + offsetY);
-
-                                if (image.contains(blurredX, blurredY)) {
-                                    Pixel blurredPixel = image.getPixel(blurredX, blurredY);
-                                    int red = (pixel.red() + color.red()) / 2;
-                                    int green = (pixel.green() + color.green()) / 2;
-                                    int blue = (pixel.blue() + color.blue()) / 2;
-                                    image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
-                                }
-                            }
+                            applyMotionBlur(image, x1, y1, pixel, color, motionBlurLength);
 
                             symmetryHandler.applySymmetry(image, point, color, xRes, yRes, fractalRect, symmetricalParts);
                         }
@@ -128,5 +102,29 @@ public class SingleThreadRenderer implements FractalRenderer {
 
     private double getRandomValue(double min, double max) {
         return min + (max - min) * random.nextDouble();
+    }
+
+    private int[] calculatePixelCoordinates(double newX, double newY, int xRes, int yRes) {
+        int x1 = (int) (xRes - Math.floor(((X_MAX - newX) / (X_MAX - X_MIN)) * xRes));
+        int y1 = (int) (yRes - Math.floor(((Y_MAX - newY) / (Y_MAX - Y_MIN)) * yRes));
+        return new int[]{x1, y1};
+    }
+
+    private void applyMotionBlur(FractalImage image, int x1, int y1, Pixel pixel, Color color, int motionBlurLength) {
+        for (int i = 0; i < motionBlurLength; i++) {
+            double offsetX = getRandomValue(-0.05, 0.05);
+            double offsetY = getRandomValue(-0.05, 0.05);
+
+            int blurredX = (int) (x1 + offsetX);
+            int blurredY = (int) (y1 + offsetY);
+
+            if (image.contains(blurredX, blurredY)) {
+                Pixel blurredPixel = image.getPixel(blurredX, blurredY);
+                int red = (pixel.red() + color.red()) / 2;
+                int green = (pixel.green() + color.green()) / 2;
+                int blue = (pixel.blue() + color.blue()) / 2;
+                image.setPixel(blurredX, blurredY, blurredPixel.hit().setColor(red, green, blue));
+            }
+        }
     }
 }
